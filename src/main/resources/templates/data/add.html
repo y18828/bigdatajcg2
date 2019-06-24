@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!--添加模板引擎-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>Dashboard Template for Bootstrap</title>
+        <!-- Bootstrap core CSS -->
+        <link href="asserts/css/bootstrap.min.css" th:href="@{/webjars/bootstrap/4.0.0/css/bootstrap.css}" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <link href="asserts/css/dashboard.css" th:href="@{/asserts/css/dashboard.css}" rel="stylesheet">
+        <style type="text/css">
+			/* Chart.js */
+			
+			@-webkit-keyframes chartjs-render-animation {
+				from {
+					opacity: 0.99
+				}
+				to {
+					opacity: 1
+				}
+			}
+			
+			@keyframes chartjs-render-animation {
+				from {
+					opacity: 0.99
+				}
+				to {
+					opacity: 1
+				}
+			}
+			
+			.chartjs-render-monitor {
+				-webkit-animation: chartjs-render-animation 0.001s;
+				animation: chartjs-render-animation 0.001s;
+			}
+		</style>
+	</head>
+
+	<body>
+	<!--引入抽取的头部标签  前提先加入模板引擎-->
+	<!--模板名字：会使用thymeleaf的前后缀配置规则进行解析-->
+	<div th:replace="commons/bar::topbar"></div>
+
+	<div class="container-fluid">
+		<div class="row">
+			<!--引入侧边栏    th:replace="~{引入的页面::#id名字}（传入一个值）"-->
+			<!--引入sidebar  -->
+			<div th:replace="commons/bar::#sidebar(activeUri='addpage.html')"></div>
+			<!--在main中添加数据添加页面-->
+			<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+				<!--form表单-->
+				<!--加上value值， 可以显示访问当前对象的信息-->
+				<!--传过来的值是model中的数据内容  此时model的命名为stu-->
+				<!--但是我们要区别是信息修改 还是信息添加-->
+				<form th:action="@{/add}" method="post">
+					<!--ID值-->
+					<!--学号  添加name属性-->
+
+					<!--发送PUT请求-->
+					<!--1.SpringMVC中配置HiddenHttpMethodFilter   （SpringBoot自动配置好的-->
+					<!--2.页面创建一个post表单-->
+					<!--3.创建一个input项，name="_method" 值就是我们指定的请求方式 -->
+					<input type="hidden" name="_method" value="put" th:if="${shuju!=null}"/>
+					<!--在修改页面的时候，判断stu是否为空 然后来取id值-->
+					<input type="hidden" name="id" th:if="${shuju!=null}" th:value="${shuju.id}">
+					<!--姓名  添加name属性-->
+					<div class="form-group">
+						<label for="exampleFormControlText1">姓名</label>
+						<input type="text" name="student.name" class="form-control" id="exampleFormControlText1" placeholder="zhangsan" th:value="${shuju!=null}?${shuju.student.name}">
+					</div>
+					<!--性别  添加name属性-->
+					<div class="form-group">
+						<label for="exampleFormControlSelect1">性别</label>
+						<select class="form-control" name="student.sex" id="exampleFormControlSelect1" th:value="${shuju!=null}?${shuju.student.sex}">
+							<option>男</option>
+							<option>女</option>
+						</select>
+					</div>
+					<!--学号  添加name属性-->
+					<div class="form-group">
+						<label for="exampleFormControlText2">学号</label>
+						<input type="text"  class="form-control" name="student.sno" id="exampleFormControlText2" placeholder="XXX" th:value="${shuju!=null}?${shuju.student.sno}">
+					</div>
+					<!--网址  添加web属性-->
+					<div class="form-group">
+						<label for="exampleFormControlText1">网址</label>
+						<!--th:value="${shuju!=null}?${shuju.site.web}-->
+						<input type="text" name="site.web" class="form-control" id="exampleFormControlText3" placeholder="www.baidu.com" >
+					</div>
+					<!--时间 添加time属性-->
+					<div class="form-group">
+						<label>日期</label>
+						<input name="time.date" type="text" class="form-control" placeholder="MM-dd HH:ss" th:value="${shuju!=null}?${shuju.time.date}">
+					</div>
+					<!--条数-->
+					<div class="form-group">
+						<label>条数</label>
+						<input name="num" type="text" class="form-control" placeholder="int" th:value="${shuju!=null}?${shuju.num}">
+					</div>
+
+					<!--添加按钮-->
+					<!--给添加按钮 的显示-->
+					<button type="submit" class="btn btn-primary" th:text="${shuju!=null}?'修改':'添加'">添加</button>
+				</form>
+				<!-- -->
+			</main>
+		</div>
+	</div>
+
+		<!-- Bootstrap core JavaScript
+    ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script type="text/javascript" src="asserts/js/jquery-3.2.1.slim.min.js" th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+        <script type="text/javascript" src="asserts/js/popper.min.js" th:src="@{/webjars/popper.js/1.11.1/dist/popper.js}"></script>
+        <script type="text/javascript" src="asserts/js/bootstrap.min.js" th:src="@{/webjars/bootstrap/4.0.0/js/bootstrap.js}"></script>
+
+        <!-- Icons -->
+        <script type="text/javascript" src="asserts/js/feather.min.js" th:src="@{/asserts/js/feather.min.js}"></script>
+		<script>
+			feather.replace()
+		</script>
+
+		<!-- Graphs -->
+		<script type="text/javascript" src="asserts/js/Chart.min.js"></script>
+		<script>
+			var ctx = document.getElementById("myChart");
+			var myChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+					datasets: [{
+						data: [15339, 21345, 18483, 24003, 23489, 24092, 12034],
+						lineTension: 0,
+						backgroundColor: 'transparent',
+						borderColor: '#007bff',
+						borderWidth: 4,
+						pointBackgroundColor: '#007bff'
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: false
+							}
+						}]
+					},
+					legend: {
+						display: false,
+					}
+				}
+			});
+		</script>
+
+	</body>
+
+</html>
